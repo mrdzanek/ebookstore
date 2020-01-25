@@ -16,11 +16,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ProductCatalogFacadeTest {
 
     @Autowired
-
+    BookRepository repository;
 
     @Test
     public void itAllowAddBookToCatalog() {
-        ProductCatalogFacade api = new ProductCatalogFacade();
+        ProductCatalogFacade api = new ProductCatalogFacade(repository);
         Book book = thereIsBookIWouldLikeToHave();
         api.addBook(book);
 
