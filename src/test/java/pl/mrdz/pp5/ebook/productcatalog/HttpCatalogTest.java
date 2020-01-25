@@ -1,5 +1,6 @@
 package pl.mrdz.pp5.ebook.productcatalog;
 
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -9,6 +10,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -24,17 +30,36 @@ public class HttpCatalogTest {
     @LocalServerPort
     int port;
 
+    @Test
     public void itAllowListProductViaHttpEndpoint() {
         therIsPublishedBook("Lord of the rings");
         therIsPublishedBook("Hobbit");
 
         ResponseEntity<Book[]> response = http.getForEntity(
-                String.format("localhost:%s/api/products", port),
+                String.format("http://localhost:%s/api/products", port),
                 Book[].class
         );
 
-        assertThat(response).isEqualTo((HttpStatus.OK));
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).hasSize(2);
         assertThat(mapToTitles(response.getBody())).contains("Hobbit");
+        assertThat(mapToTitles(response.getBody())).contains("Lord of the rings");
+    }
+
+    private List<String> mapToTitles(Book[] array) {
+        return Stream.of(array)
+                .map(b -> b.title)
+                .collect(Collectors.toList());
+    }
+
+    private void therIsPublishedBook(String title) {
+        productCatalogFacade.addBook(Book.builder()
+                .title(title)
+                .description("title")
+                .cover("http://cover.dev")
+                .price(BigDecimal.valueOf(100.0))
+                .published(true)
+                .build()
+        );
     }
 }
