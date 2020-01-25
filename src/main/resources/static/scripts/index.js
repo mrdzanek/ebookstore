@@ -21,10 +21,10 @@ function toProductHtmlTemplate(product) {
 }
 
 function toHtmlElement(templateStr) {
-    htmlElement = document.createElement('<div>');
-    htmlElement.innerHTML = templateStr;
+    let htmlElement = document.createElement('div');
+    htmlElement.innerHTML = templateStr.trim();
 
-    return htmlElement.firstChild();
+    return htmlElement.firstChild;
 }
 
 function initializeAddToBasket(htmlElement) {
@@ -42,9 +42,9 @@ function initializeAddToBasket(htmlElement) {
 
     getProducts().then((products) => {
         products
-            .map(toProductHtmlTemplate)
-            .map(toElement)
-            .map(initializeAddToBasket)
+            .map(p => toProductHtmlTemplate(p))
+            .map(htmlStr => toHtmlElement(htmlStr))
+            .map(elem => initializeAddToBasket(elem))
             .forEach((element) => {
                 productsListElement.appendChild(element);
             });
